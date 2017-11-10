@@ -1,25 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-/*
-export const Counter = ({ counter, increment, doubleAsync }) => (
-  <div style={{ margin: '0 auto' }} >
-    <h2>Counter: {counter}</h2>
-    <button className='btn btn-primary' onClick={increment}>
-      Increment
-    </button>
-    {' '}
-    <button className='btn btn-secondary' onClick={doubleAsync}>
-      Double (Async)
-    </button>
-  </div>
-)
-Counter.propTypes = {
-  counter: PropTypes.number.isRequired,
-  increment: PropTypes.func.isRequired,
-  doubleAsync: PropTypes.func.isRequired,
-}
-*/
 
 class Blog extends Component {
   render() {
@@ -57,12 +38,20 @@ class BlogWrap extends Component {
 
 
   render() {
+    let isAdmin = window.localStorage.getItem('login');
+    let isPass = window.localStorage.getItem('password');
+    let postsEdit;
+    if ((isAdmin === 'admin') && (isPass === 'admin')) {
+      postsEdit = <button className='btn' onClick={this.addpostBlog.bind(this)}>Add post </button> 
+    } else {
+      postsEdit = <p>Вы не авторизованы, чтобы добавлять и удалять сообщения!</p>
+    }
     const { posts } = this.props
     return <div className="blog-wrap">
               <h4>Тут небольшой блог с добавлением и удалением постов. </h4>
               <p>Title<input type='text' onChange={(e) => this.setState({title: e.target.value})} value={this.state.title} /></p>
               <p>Text<textarea onChange={(e) => this.setState({text: e.target.value})} value={this.state.text} /></p>
-              <button className='btn' onClick={this.addpostBlog.bind(this)}>Add post </button> 
+              {postsEdit}
               <BlogPosts posts={posts} delpost={this.props.delpost} searchpost={this.props.searchpost}/>
            </div>
   }
@@ -86,7 +75,11 @@ class BlogPosts extends Component {
 
 
   render() {
-      const posts = this.props.posts.filter((post) => post.title.includes(this.state.search)).map((post) => (
+      let posts;
+      let isAdmin = window.localStorage.getItem('login');
+      let isPass = window.localStorage.getItem('password');
+      if ((isAdmin === 'admin') && (isPass === 'admin')) {
+      posts = this.props.posts.filter((post) => post.title.includes(this.state.search)).map((post) => (
         <div id={post.id} className='blogpost' >
           <p><b>Title:</b> {post.title}</p>
           <p><b>Date:</b> {post.date}</p>
@@ -95,6 +88,16 @@ class BlogPosts extends Component {
           <br /><br /><br />
         </div>
         ))
+     } else {
+       posts = this.props.posts.filter((post) => post.title.includes(this.state.search)).map((post) => (
+        <div id={post.id} className='blogpost' >
+          <p><b>Title:</b> {post.title}</p>
+          <p><b>Date:</b> {post.date}</p>
+          <p><b>Text:</b> {post.text}</p>
+          <br /><br /><br />
+        </div>
+        ))
+     }
     return <div>
             <p>Поиск по сообщениям</p>
             <input type='text' onChange={this.search.bind(this)}/>

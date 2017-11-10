@@ -5,6 +5,7 @@ const logger = require('../build/lib/logger')
 const webpackConfig = require('../build/webpack.config')
 const project = require('../project.config')
 const compress = require('compression')
+const fs = require('fs');
 
 const app = express()
 app.use(compress())
@@ -39,16 +40,20 @@ if (project.env === 'development') {
   // (ignoring file requests). If you want to implement universal
   // rendering, you'll want to remove this middleware.
   app.use('*', function (req, res, next) {
-    const filename = path.join(compiler.outputPath, 'index.html')
+    const filename = path.join(compiler.outputPath, 'index.html');
+    console.log('Time:', Date.now());
     compiler.outputFileSystem.readFile(filename, (err, result) => {
       if (err) {
         return next(err)
       }
+      console.log('Time:', Date.now());
       res.set('content-type', 'text/html')
       res.send(result)
       res.end()
     })
   })
+
+
 } else {
   logger.warn(
     'Server is being run outside of live development mode, meaning it will ' +
@@ -63,11 +68,9 @@ if (project.env === 'development') {
   // server in production.
   app.use(express.static(path.resolve(project.basePath, project.outDir)))
 
-  var obj = {
-    dataobj: []
-  };
 
-  obj.dataobj.push({id: 1, square: 2})
+
+
 }
 
 module.exports = app
