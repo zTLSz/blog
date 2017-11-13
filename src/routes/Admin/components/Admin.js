@@ -4,8 +4,17 @@ import PropTypes from 'prop-types'
 class Admin extends Component {
   constructor() {
     super(...arguments)
-    this.state = {
-      logged: false
+    let isAdmin = window.localStorage.getItem('login');
+    let isPass = window.localStorage.getItem('password');
+
+    if ((isAdmin === 'admin') && (isPass === 'admin')) {
+      this.state = {
+        logged: true
+      }
+    } else {
+      this.state = {
+        logged: false
+      }
     }
   }
 
@@ -16,11 +25,18 @@ class Admin extends Component {
     const password = e.target.elements[1].value
     window.localStorage.setItem('login', value)
     window.localStorage.setItem('password', password)
-    console.log(window.localStorage)
+    if ((value === 'admin') && (password === 'admin')) {
+      this.setState({
+        logged: true    
+      })
+    }
   }
 
   logout() {
     window.localStorage.clear();
+    this.setState({
+        logged: false    
+    })
   }
 
   render() {
@@ -30,11 +46,11 @@ class Admin extends Component {
 
     let isLogged;
 
-    if ((isAdmin === 'admin') && (isPass === 'admin')) {
+    if ((isAdmin === 'admin') && (isPass === 'admin') && (this.state.logged)) {
       isLogged = <div><button className='btn' type='submit' onClick={this.logout.bind(this)}>Выйти</button></div>
-    } else {
+    } else if ((isAdmin !== 'admin') && (isPass !== 'admin') && (this.state.logged == false)) {
       isLogged = <div>
-                  <form className='col-md-4' onSubmit={this.handleSubmit.bind(this)}>
+                  <form className='col-md-3' onSubmit={this.handleSubmit.bind(this)}>
                     <input type='text' placeholder='login'/>
                     <input type='password' placeholder='Password'/>
                     <button className='btn' type='submit'>Войти</button>
@@ -43,7 +59,9 @@ class Admin extends Component {
     }
 
     return <div className='row'>
+        <div className='login-form'>
           {isLogged}
+        </div>
     </div>
   }
 }
