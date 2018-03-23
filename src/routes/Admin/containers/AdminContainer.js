@@ -1,6 +1,7 @@
 import { connect } from 'react-redux'
-import { login } from '../modules/admin'
+import { addData } from '../modules/admin'
 import { bindActionCreators } from 'redux'
+
 
 /*  This is a container component. Notice it does not contain any JSX,
     nor does it import React. This component is **only** responsible for
@@ -15,7 +16,7 @@ import Admin from '../components/Admin'
 
 function mapDispatchToProps(dispatch) {
   return {
-    loginAction: bindActionCreators(login, dispatch),
+    loginAction: bindActionCreators(addData, dispatch),
   }
 }
 
@@ -26,9 +27,8 @@ const mapStateToProps = (state) => ({
 */
 
 function mapStateToProps(state) {
-  console.log(state);
   return {
-    login: state.login
+    data: state.admin.data,
   }
 }
 

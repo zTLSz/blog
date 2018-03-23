@@ -1,113 +1,135 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-
+import ProgressBar, { Circle } from 'react-progressbar.js'
+let int;
 
 class Blog extends Component {
-  render() {
-    const { posts } = this.props
-    const { addAction } = this.props
-    const { delAction } = this.props
-    const { searchAction } = this.props
-   // const { addPost  } = this.props.pageActions.Actions
 
-    return <div className='row'>
-        <BlogWrap add={addAction} posts={posts} delpost={delAction} searchpost={searchAction}/>
-    </div>
+
+  autoclick() {
+    let isEnabled = true;
+    if (this.props.clicker_1.amount == 0) {
+      isEnabled = false;
+    }
+    this.props.bc1action();
+    if (isEnabled === false) {
+      int = setInterval(() => {
+        this.props.attackAction();
+      }, 1000);
+      isEnabled = true;
+    }
+  }
+
+  buy_2_clicker() {
+    this.props.bc2action();
+  }
+
+  load() {
+    
+    let promise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          this.props.loadaction();
+          resolve("result");
+        }, 100);
+    });
+
+    promise
+      .then(
+        result => {
+          if (this.props.clicker_1.amount > 0) {
+            clearInterval(int);
+            int = setInterval(() => {
+              this.props.attackAction();
+            }, 1000);
+          }
+        },
+      );
+  }
+
+  render() {
+    const { health } = this.props
+    const { gold } = this.props
+    const { level } = this.props
+    const { kills } = this.props
+    const { attackAction } = this.props
+    const { bc1action } = this.props
+    const { clicker_1 } = this.props
+    const { clicker_2 } = this.props
+    const { saveaction } = this.props
+    const { loadaction } = this.props
+    let maxhealth = health / (10 + (kills - 1)*100)
+    let hprogress = this.props.kills / 50
+    let options = {
+      color: '#aaa',
+      strokeWidth: 5,
+    }
+    let optionsH = {
+      color: '#222',
+      strokeWidth: 5, 
+      duration: 200,
+    }
+
+    return <div className="mdl-grid demo-content game">
+              <div className="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--12-col">
+                 <BlogWrap health={health} 
+                 level={level}
+                 kills={kills}
+                 gold={gold} 
+                 clicker_1={clicker_1}
+                 clicker_2={clicker_2} />
+              </div>
+              <div className="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--3-col progress-graph">
+                <Circle
+                  progress={hprogress}
+                  text={'Уровень ' + level}
+                  options={options}
+                  initialAnimate={false} />
+              </div>
+              <div className="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--3-col progress-graph">
+                <Circle
+                  progress={maxhealth}
+                  text={'Здоровье монстра'}
+                  options={optionsH}
+                  initialAnimate={false} />
+              </div>
+              <div className="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--4-col">
+                 <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+                 onClick={attackAction}>Атаковать</button>
+                 <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+                 onClick={this.autoclick.bind(this)}>Купить автокликер за {clicker_1.curr_cost + clicker_1.start_cost}</button>
+                 <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" 
+                 onClick={this.buy_2_clicker.bind(this)}>Купить автокликер за {clicker_2.curr_cost + clicker_2.start_cost}</button>
+              </div>
+              <div className="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--3-col">
+                  <button onClick={saveaction}
+                  className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Сохранить</button>
+                   <button onClick={this.load.bind(this)}
+                  className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Загрузить</button>
+              </div>
+          </div>
   }
 }
 
 class BlogWrap extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      title: '',
-      text: ''
-    }
-
-  }
-
-  addpostBlog() {
-    this.props.add(this.state.title, this.state.text)
-    this.setState({
-      title: '',
-      text: ''    
-    })
-  }
-
 
 
   render() {
-    let isAdmin = window.localStorage.getItem('login');
-    let isPass = window.localStorage.getItem('password');
-    let postsEdit;
-    if ((isAdmin === 'admin') && (isPass === 'admin')) {
-      postsEdit = <button className='btn' onClick={this.addpostBlog.bind(this)}>Add post </button> 
-    } else {
-      postsEdit = <p>Вы не авторизованы, чтобы добавлять и удалять сообщения!</p>
-    }
-    const { posts } = this.props
+    const { health } = this.props
+    const { gold } = this.props
+    const { kills } = this.props
+    const { level } = this.props
+    const { clicker_1 } = this.props
+    const { clicker_2 } = this.props
     return <div className="blog-wrap">
-              <h4>Тут небольшой блог с добавлением и удалением постов. </h4>
-              <p>Title<input type='text' onChange={(e) => this.setState({title: e.target.value})} value={this.state.title} /></p>
-              <p>Text<textarea onChange={(e) => this.setState({text: e.target.value})} value={this.state.text} /></p>
-              {postsEdit}
-              <BlogPosts posts={posts} delpost={this.props.delpost} searchpost={this.props.searchpost}/>
+              <p>Золото: <b>{gold}</b></p>
+              <p>Убито монстров: <b>{kills - 1}</b></p>
+              <p>Уровень: <b>{level}</b></p>
+              <p>Здоровье монстра: <b>{health}</b></p>
+              <p>Сила атаки: <b>{1 + clicker_1.atk_dmg*clicker_1.amount + clicker_2.atk_dmg*clicker_2.amount}</b></p>
            </div>
   }
 
 }
-
-
-class BlogPosts extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      search: ''
-    }
-  }
-
-  search(e) {
-    this.setState({
-      search: e.target.value
-    })
-  }
-
-
-  render() {
-      let posts;
-      let isAdmin = window.localStorage.getItem('login');
-      let isPass = window.localStorage.getItem('password');
-      if ((isAdmin === 'admin') && (isPass === 'admin')) {
-      posts = this.props.posts.filter((post) => post.title.includes(this.state.search)).map((post) => (
-        <div id={post.id} className='blogpost' >
-          <p><b>Title:</b> {post.title}</p>
-          <p><b>Date:</b> {post.date}</p>
-          <p><b>Text:</b> {post.text}</p>
-          <button className='btn' onClick={() => this.props.delpost(post.id)} >Delete post </button> 
-          <br /><br /><br />
-        </div>
-        ))
-     } else {
-       posts = this.props.posts.filter((post) => post.title.includes(this.state.search)).map((post) => (
-        <div id={post.id} className='blogpost' >
-          <p><b>Title:</b> {post.title}</p>
-          <p><b>Date:</b> {post.date}</p>
-          <p><b>Text:</b> {post.text}</p>
-          <br /><br /><br />
-        </div>
-        ))
-     }
-    return <div>
-            <p>Поиск по сообщениям</p>
-            <input type='text' onChange={this.search.bind(this)}/>
-            <p><h3>Сообщения</h3></p>
-            {posts}
-          </div>
-  }
-
-}
-
 
 
 

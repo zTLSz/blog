@@ -1,33 +1,46 @@
+
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const LOGIN = 'LOGIN'
+export const GET_DATA = 'GET_DATA'
+
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function login() {
+
+
+
+export function addData(data) {
   return (dispatch) => {  
       dispatch({
-        type: LOGIN,
-        payload: 'admin'
+        type: GET_DATA,
+        payload: data
       })
     }
 }
+
+
  
 
 
 
-// ------------------------------------
+// ---------------------------------------
 // Reducer
 // ------------------------------------
-const initstate = 'admin'
+const initstate = {
+  data: [],
+};
 
 export default function blogReducer(state = initstate, action) {
 
   switch (action.type) {
-    case LOGIN:
-      return state
+    case GET_DATA:
+      console.log(action.payload)
+      return {
+        ...state,
+        data: action.payload,
+      }
     default:
       return state
   }

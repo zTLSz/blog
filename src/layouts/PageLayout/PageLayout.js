@@ -13,19 +13,33 @@ function checkLogin() {
 
 export const PageLayout = ({ children }) => (
 
-  <div className='container text-center'>
-    <h1>Тестовый блог SPA React+Redux</h1>
-    <IndexLink to='/' activeClassName='page-layout__nav-item--active'>Главная страница</IndexLink>
-    {' · '}
-    <Link to='/TestPage' activeClassName='page-layout__nav-item--active'>Страница описания</Link>
-    {' · '}
-    <Link to='/blog' activeClassName='page-layout__nav-item--active'>Блог (тестовая страница с  действиями)</Link>
-    {' · '}
-    <Link to='/admin' activeClassName='page-layout__nav-item--active' onEnter={checkLogin()}>Войти</Link>
-    <div className='page-layout__viewport'>
-      {children}
+  <div className='mdl-layout__container'>
+    <div className="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header has-drawer is-upgraded">
+      <header className="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600 is-casting-shadow">
+        <div className="mdl-layout__header-row">
+          <h1>Тестовый блог SPA</h1>
+        </div>
+      </header>
+      <div className="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+        <nav className="demo-navigation mdl-navigation mdl-color--blue-grey-900">
+          <IndexLink to='/' className='mdl-navigation__link' activeClassName='mdl-navigation__link__active'>
+            Главная страница
+          </IndexLink>
+          {''}
+          <Link to='/TestPage' className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Страница описания</Link>
+          {''}
+          <Link to='/blog'  className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Игра</Link>
+          {''}
+          <Link to='/admin' className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active' onEnter={checkLogin()}>Войти</Link>
+        </nav>
+      </div>
+      <div className='mdl-layout__content mdl-color--grey-50'>
+        <div>
+          {children}
+        </div>
+      </div>
+      <div className="mdl-mini-footer">Footer</div>
     </div>
-    <div className="footer">Footer</div>
   </div>
 )
 PageLayout.propTypes = {
