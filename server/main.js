@@ -27,9 +27,12 @@ app.use(compress());
   const NoteSchema = new Schema({
       name: { type: String },
       text: { type: String },
-      date: { type: Date },
+      date: { type: String },
+      dateMs: { type: Number },
       number: { type: Number },
-      rate: { type: Number }
+      rate: { type: Number },
+      isThread: { type: Boolean },
+      threadPosts:  [Schema.Types.Mixed]
   });
 
   // model for posts amount
@@ -67,8 +70,8 @@ if (project.env === 'development') {
 
   // add methods for the Notes page
 
-  let dataNote = () => { 
-    return Note.find();
+  let dataNote = (findOptions) => { 
+    return Note.find(findOptions);
   };
 
   let delNote = (id) => { 
@@ -84,14 +87,17 @@ if (project.env === 'development') {
   }
 
 
+
   app.get('/postsData', function (req, res, next) {
-    dataNote().then(data => res.send(data));
+    dataNote({ isThread: true }).then(data => res.send(data));
   });
 
 
   // add new post and set number and date
 
   app.post('/postsData', function(req, res, next) {
+
+    // case if add new post
     // check amount of posts 
     numberForEmptyData().then(data => {
         const saveAmount = data[data.length - 1].amount + 1 
@@ -101,20 +107,58 @@ if (project.env === 'development') {
         clearAmount().then(() => amount.save());
         return saveAmount;
       }).then((saveAmount) => {
-         const note = new Note({
-              name: req.body.name,
-              text: req.body.text,
-              date: Date.now(),
-              number: saveAmount,
-              rate: 0,
-          });
-          note.save().then( () => dataNote() ).then(data => res.send(data));
+         // set date
+         const dateNow = new Date();
+         const dateNowString = dateNow.getFullYear() + '-' + dateNow.getMonth() + '-' +
+         dateNow.getDate() + ' ' + dateNow.getHours() + ':' + (dateNow.getMinutes() < 10 ? '0': '')
+          + dateNow.getMinutes() + ':' + dateNow.getSeconds();
+         // create new post
+         // if it is new thread make a new post
+          if (req.body.isThread === true) {
+           const note = new Note({
+                name: req.body.name,
+                text: req.body.text,
+                date: dateNowString,
+                dateMs: Date.now(), 
+                number: saveAmount,
+                rate: 0,
+                isThread: req.body.isThread,
+                threadPosts: []
+            });
+
+            note.save().then( () => dataNote({ isThread: true }) )
+              .then(data => { 
+                if (data.length > 5) { // removing last thread
+                    Note.find({})
+                } else {
+                  return data;
+                }
+              })
+              .then(data => res.send(data));
+          }
+
+        // if post is not new thread, search "thread post" and add answer to them
+          if (!req.body.isThread) {
+            Note.findOne({ number: req.body.threadNumber }).then((data) => {
+              data.threadPosts.push({
+                name: req.body.name,
+                text: req.body.text,
+                date: dateNowString,
+                dateMs: Date.now(), 
+                number: saveAmount,
+                rate: 0,
+                isThread: req.body.isThread,               
+              });
+              data.save().then( () => dataNote({ isThread: true }) ).then(data => res.send(data));
+              return data
+            })
+          }
         });
     });
 
   app.delete('/postsData/:id', function (req, res, next) {
     // console.log(req.params);
-    delNote(req.params.id).then( () => dataNote() ).then(data => res.send(data));
+    delNote(req.params.id).then( () => dataNote({ isThread: true }) ).then(data => res.send(data));
   });
 
 

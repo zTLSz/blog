@@ -252,7 +252,7 @@ _:-ms-input-placeholder, :root .demo-graph {
 }
 
 .board-post .mdl-card {
-  min-height: 150px;
+  min-height: 90px;
 }
 
 .board-post__ed .mdl-textfield__input {
@@ -263,3 +263,22 @@ textarea, input {
   resize: none;
   outline: none;
 }
+
+.post-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .post__date {
+    color: rgba(0,0,0,.54);
+    font-size: 1rem;
+  }
+}
+
+
+.posts_button button {
+  margin-right: 10px;
+} 
+
+.post-form__error {
+  color: red;
+} 
