@@ -37,7 +37,7 @@ class Admin extends Component {
   getRandomColor() {
     let letters = '0123456789ABCDEF';
     let color = '#9e';
-    for (var i = 2; i < 6; i++) {
+    for (let i = 2; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
@@ -69,11 +69,12 @@ class Admin extends Component {
         <div className="mdl-card__actions mdl-card--border post-card__actions">
           <div className="posts_button">
             <button className="mdl-button mdl-button--raised mdl-js-ripple-effect" onClick={() => { this.deleteNote(dataItem._id) } }>Удалить</button>
+            {dataItem.threadPosts.length > 19 ? 'Превышено максимальное количество сообщений!' : '' }
           </div>
           <div className="post__date">{dataItem.date}</div>
         </div>
         <ThreadAnswers posts={dataItem.threadPosts} />
-        { dataItem.isThread &&
+        { (dataItem.isThread && (dataItem.threadPosts.length <= 19)) &&
         <NoteCreator createNote={this.createNote.bind(this)} isAnswer={true} 
         isAnswerFor={dataItem.number}
         loginAction={this.props.loginAction.bind(this)} />}
@@ -170,7 +171,7 @@ class NoteCreator extends Component {
                 </div>
                 <form>
                   <div className="mdl-card__supporting-text" >
-                    <input type="text" className="mdl-textfield__input" placeholder="Ответить в тему №" 
+                    <input type="text" className="mdl-textfield__input" placeholder="Создать новую тему" 
                     value={formAnswer} disabled />
                     <input type="text" className="mdl-textfield__input" rows= "3"  placeholder="Введите имя" 
                     value={this.state.name}

@@ -85,7 +85,7 @@ if (project.env === 'development') {
   let clearAmount = () => {
     return Amount.remove({});
   }
-
+ 
 
 
   app.get('/postsData', function (req, res, next) {
@@ -96,7 +96,6 @@ if (project.env === 'development') {
   // add new post and set number and date
 
   app.post('/postsData', function(req, res, next) {
-
     // case if add new post
     // check amount of posts 
     numberForEmptyData().then(data => {
@@ -107,6 +106,7 @@ if (project.env === 'development') {
         clearAmount().then(() => amount.save());
         return saveAmount;
       }).then((saveAmount) => {
+
          // set date
          const dateNow = new Date();
          const dateNowString = dateNow.getFullYear() + '-' + dateNow.getMonth() + '-' +
@@ -128,30 +128,53 @@ if (project.env === 'development') {
 
             note.save().then( () => dataNote({ isThread: true }) )
               .then(data => { 
-                if (data.length > 5) { // removing last thread
-                    Note.find({})
+                if (data.length > 10) { // removing last thread
+                    Note.find({}).then(rdata => { //find oldest note
+                        const dateNow = Date.now()
+                        rdata.sort(function(a, b) {
+                            if ((b.threadPosts.length > 0) && (a.threadPosts.length > 0)) {
+                              return a.threadPosts[a.threadPosts.length - 1].dateMs - b.threadPosts[b.threadPosts.length - 1].dateMs
+                            }
+                            if ((b.threadPosts.length == 0) && (a.threadPosts.length > 0)) {
+                              return a.threadPosts[a.threadPosts.length - 1].dateMs - b.dateMs
+                            }
+                            if ((b.threadPosts.length > 0) && (a.threadPosts.length == 0)) {
+                              return a.dateMs - b.threadPosts[b.threadPosts.length - 1].dateMs
+                            }
+                            if ((b.threadPosts.length == 0) && (a.threadPosts.length == 0)) {
+                              return a.dateMs - b.dateMs;
+                            }
+                        });
+                        let oldestNoteId = rdata[0]._id // id of the oldest thread
+                        delNote(oldestNoteId).then( () => dataNote({ isThread: true }) ).then(data => res.send(data));
+                    });
                 } else {
-                  return data;
+                  res.send(data);
                 }
               })
-              .then(data => res.send(data));
+              // .then(data => res.send(data));
           }
 
         // if post is not new thread, search "thread post" and add answer to them
           if (!req.body.isThread) {
-            Note.findOne({ number: req.body.threadNumber }).then((data) => {
-              data.threadPosts.push({
-                name: req.body.name,
-                text: req.body.text,
-                date: dateNowString,
-                dateMs: Date.now(), 
-                number: saveAmount,
-                rate: 0,
-                isThread: req.body.isThread,               
-              });
-              data.save().then( () => dataNote({ isThread: true }) ).then(data => res.send(data));
-              return data
-            })
+                Note.findOne({ number: req.body.threadNumber }).then((data) => {
+                  if (data.threadPosts.length <= 19) {  
+                      data.threadPosts.push({
+                        name: req.body.name,
+                        text: req.body.text,
+                        date: dateNowString,
+                        dateMs: Date.now(), 
+                        number: saveAmount,
+                        rate: 0,
+                        isThread: req.body.isThread,               
+                      });
+                      data.save().then( () => dataNote({ isThread: true }) ).then(data => res.send(data));
+                      return data;
+                  } else {
+                        console.log('bump-limit');
+                        res.send(data);
+                  }
+                });
           }
         });
     });
