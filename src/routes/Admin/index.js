@@ -1,5 +1,5 @@
 import { injectReducer } from '../../store/reducers'
-import Admin from './components/Admin'
+import MainBoard from './components/Admin'
 
 export default (store) => ({
   path : 'board',

@@ -11,8 +11,8 @@ const Circle = ProgressBar.Circle;
 const mongoose = require('mongoose');
 const bodyParser =  require('body-parser');
 const app = express();
+const note = require('./db');
 app.use(compress());
-
 
 // ------------------------------------
 // DB
@@ -22,26 +22,7 @@ app.use(compress());
   //creating model 
   app.use( bodyParser.json() );
 
-  const Schema = mongoose.Schema;
-
-  const NoteSchema = new Schema({
-      name: { type: String },
-      text: { type: String },
-      date: { type: String },
-      dateMs: { type: Number },
-      number: { type: Number },
-      rate: { type: Number },
-      isThread: { type: Boolean },
-      threadPosts:  [Schema.Types.Mixed]
-  });
-
-  // model for posts amount
-  const AmountSchema = new Schema({
-      amount: { type: Number },
-  });
-
-  mongoose.model('Note', NoteSchema);
-  mongoose.model('Amount', AmountSchema)
+  require('./db.js').makedb(mongoose);
 
   const Note = mongoose.model('Note');
   const Amount = mongoose.model('Amount');
@@ -109,9 +90,7 @@ if (project.env === 'development') {
 
          // set date
          const dateNow = new Date();
-         const dateNowString = dateNow.getFullYear() + '-' + dateNow.getMonth() + '-' +
-         dateNow.getDate() + ' ' + dateNow.getHours() + ':' + (dateNow.getMinutes() < 10 ? '0': '')
-          + dateNow.getMinutes() + ':' + dateNow.getSeconds();
+         const dateNowString = dateNow.toLocaleString();
          // create new post
          // if it is new thread make a new post
           if (req.body.isThread === true) {
@@ -197,8 +176,6 @@ if (project.env === 'development') {
       res.end()
     })
   })
-
-
 } else {
   logger.warn(
     'Server is being run outside of live development mode, meaning it will ' +
@@ -207,15 +184,7 @@ if (project.env === 'development') {
     'server such as nginx to serve your static files. See the "deployment" ' +
     'section in the README for more information on deployment strategies.'
   )
-
-  // Serving ~/dist by default. Ideally these files should be served by
-  // the web server and not the app server, but this helps to demo the
-  // server in production.
   app.use(express.static(path.resolve(project.basePath, project.outDir)))
-
-
-
-
 }
 
 module.exports = app

@@ -3,14 +3,6 @@ import { IndexLink, Link } from 'react-router'
 import PropTypes from 'prop-types'
 import './PageLayout.scss'
 
-function checkLogin() {
-  const login = window.localStorage.getItem('login')
-  const password = window.localStorage.getItem('password')
-  if (login === 'admin' && password === 'admin') {
-    console.log('пропусти')
-  }
-}
-
 export const PageLayout = ({ children }) => (
 
   <div className='mdl-layout__container'>
@@ -26,11 +18,11 @@ export const PageLayout = ({ children }) => (
             Главная страница
           </IndexLink>
           {''}
-          <Link to='/TestPage' className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Страница описания</Link>
+          <Link to='/TestPage/' className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Страница описания</Link>
           {''}
-          <Link to='/blog'  className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Игра</Link>
+          <Link to='/blog/'  className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Игра</Link>
           {''}
-          <Link to='/board' className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active' onEnter={checkLogin()}>Текстовая борда</Link>
+          <Link to='/board/' className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Текстовая борда</Link>
         </nav>
       </div>
       <div className='mdl-layout__content mdl-color--grey-50'>

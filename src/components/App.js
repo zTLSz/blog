@@ -1,6 +1,7 @@
 import React from 'react'
 import { browserHistory, Router } from 'react-router'
 import { Provider } from 'react-redux'
+import { createHashHistory } from 'history'
 import PropTypes from 'prop-types'
 
 class App extends React.Component {
