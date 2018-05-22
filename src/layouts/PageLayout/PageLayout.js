@@ -22,7 +22,7 @@ export const PageLayout = ({ children }) => (
           {''}
           <Link to='/blog/'  className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Игра</Link>
           {''}
-          <Link to='/board/' className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Текстовая борда</Link>
+          <Link to='/board/' className='mdl-navigation__link'  activeClassName='mdl-navigation__link__active'>Текстовая доска</Link>
         </nav>
       </div>
       <div className='mdl-layout__content mdl-color--grey-50'>

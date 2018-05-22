@@ -58,6 +58,7 @@ class MainBoard extends Component {
   }
 
 
+
   render() {
     const items = this.props.data.map((dataItem) => 
       <div key={dataItem._id} className='mdl-cell--12-col demo-card-square mdl-card mdl-shadow--2dp mdl-cell' id={'board-post__' + dataItem.number}>
