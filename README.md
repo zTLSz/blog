@@ -1,6 +1,6 @@
 React + Redux SPA
 
-Live version http://board-ztlsz.c9users.io/
+Live version http://107.175.61.232:3000/
 
 <b>Технологии:</b>
 	<li>React</li>
